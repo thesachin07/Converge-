@@ -1,10 +1,12 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useEffect, useMemo, type ReactNode } from "react";
 import Link from "next/link";
 import { EditorContent, useEditor } from "@tiptap/react";
+import Collaboration from "@tiptap/extension-collaboration";
 import LinkExtension from "@tiptap/extension-link";
 import StarterKit from "@tiptap/starter-kit";
+import * as Y from "yjs";
 import {
   Bold,
   Code2,
@@ -64,21 +66,35 @@ function ToolbarButton({ label, active, disabled, onClick, children }: ToolbarBu
 }
 
 export default function DocumentEditor({ documentId }: DocumentEditorProps) {
+  const ydoc = useMemo(() => new Y.Doc({ guid: documentId }), [documentId]);
+
+  useEffect(() => {
+    return () => ydoc.destroy();
+  }, [ydoc]);
+
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({ undoRedo: false }),
+      Collaboration.configure({ document: ydoc }),
       LinkExtension.configure({
         autolink: true,
         openOnClick: false,
       }),
     ],
-    content: initialContent,
+    onCreate: ({ editor: createdEditor }) => {
+      const fragment = ydoc.getXmlFragment("default");
+
+      if (fragment.length === 0) {
+        createdEditor.commands.setContent(initialContent);
+      }
+    },
     editorProps: {
       attributes: {
         class: "editor-content focus:outline-none",
       },
     },
-  });
+    immediatelyRender: false,
+  }, [documentId, ydoc]);
 
   if (!editor) {
     return null;
