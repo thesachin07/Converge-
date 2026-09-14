@@ -32,3 +32,98 @@ body {
 @utility toolbar-select {
   @apply flex h-8 items-center gap-2 rounded px-2 text-xs text-[#647084] transition hover:bg-[#e9edf2] hover:text-[#26364d];
 }
+
+.editor-content {
+  color: #3f4b5e;
+  font-size: 15px;
+  line-height: 1.9;
+}
+
+.editor-content > * + * {
+  margin-top: 1.5rem;
+}
+
+.editor-content p {
+  margin-top: 1.5rem;
+}
+
+.editor-content > p:first-child {
+  margin: 0 0 1.5rem;
+  color: #9aa3b1;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  line-height: 1rem;
+  text-transform: uppercase;
+}
+
+.editor-content h1,
+.editor-content h2 {
+  color: #172033;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.2;
+}
+
+.editor-content h1 {
+  margin-top: 0;
+  font-size: clamp(2.25rem, 5vw, 3rem);
+}
+
+.editor-content h2 {
+  margin-top: 2rem;
+  font-size: 1.25rem;
+}
+
+.editor-content h1 + p {
+  max-width: 42rem;
+  color: #687386;
+  font-size: 1.125rem;
+  line-height: 2rem;
+}
+
+.editor-content ul,
+.editor-content ol {
+  padding-left: 1.5rem;
+}
+
+.editor-content li + li {
+  margin-top: 0.5rem;
+}
+
+.editor-content blockquote {
+  border-left: 3px solid #cbd8e6;
+  color: #687386;
+  padding-left: 1rem;
+}
+
+.editor-content pre {
+  overflow-x: auto;
+  border-radius: 0.375rem;
+  background: #172033;
+  color: #e8eef5;
+  padding: 1rem;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.editor-content code {
+  border-radius: 0.25rem;
+  background: #eef1f5;
+  padding: 0.15rem 0.3rem;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.875em;
+}
+
+.editor-content pre code {
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+}
+
+.editor-content a {
+  color: #315e88;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
