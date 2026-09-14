@@ -24,3 +24,11 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@utility toolbar-button {
+  @apply flex h-8 min-w-8 items-center justify-center rounded px-2 text-xs text-[#647084] transition hover:bg-[#e9edf2] hover:text-[#26364d];
+}
+
+@utility toolbar-select {
+  @apply flex h-8 items-center gap-2 rounded px-2 text-xs text-[#647084] transition hover:bg-[#e9edf2] hover:text-[#26364d];
+}
