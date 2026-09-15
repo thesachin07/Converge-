@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { EditorContent, useEditor } from "@tiptap/react";
 import Collaboration from "@tiptap/extension-collaboration";
 import LinkExtension from "@tiptap/extension-link";
 import StarterKit from "@tiptap/starter-kit";
+import { IndexeddbPersistence } from "y-indexeddb";
 import * as Y from "yjs";
 import {
   Bold,
@@ -67,14 +68,29 @@ function ToolbarButton({ label, active, disabled, onClick, children }: ToolbarBu
 
 export default function DocumentEditor({ documentId }: DocumentEditorProps) {
   const ydoc = useMemo(() => new Y.Doc({ guid: documentId }), [documentId]);
+  const [readyDocumentId, setReadyDocumentId] = useState<string | null>(null);
+  const isPersistenceReady = readyDocumentId === documentId;
 
   useEffect(() => {
-    return () => ydoc.destroy();
-  }, [ydoc]);
+    let isMounted = true;
+    const persistence = new IndexeddbPersistence(`converge:${documentId}`, ydoc);
+
+    persistence.whenSynced.then(() => {
+      if (isMounted) {
+        setReadyDocumentId(documentId);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      persistence.destroy();
+      ydoc.destroy();
+    };
+  }, [documentId, ydoc]);
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({ undoRedo: false }),
+      StarterKit.configure({ undoRedo: false, link: false }),
       Collaboration.configure({ document: ydoc }),
       LinkExtension.configure({
         autolink: true,
@@ -84,7 +100,7 @@ export default function DocumentEditor({ documentId }: DocumentEditorProps) {
     onCreate: ({ editor: createdEditor }) => {
       const fragment = ydoc.getXmlFragment("default");
 
-      if (fragment.length === 0) {
+      if (isPersistenceReady && fragment.length === 0 && ydoc.store.clients.size === 0) {
         createdEditor.commands.setContent(initialContent);
       }
     },
@@ -94,9 +110,9 @@ export default function DocumentEditor({ documentId }: DocumentEditorProps) {
       },
     },
     immediatelyRender: false,
-  }, [documentId, ydoc]);
+  }, [documentId, isPersistenceReady, ydoc]);
 
-  if (!editor) {
+  if (!editor || !isPersistenceReady) {
     return null;
   }
 
